@@ -1,7 +1,11 @@
 package mms.helper.ui.fm7;
 
 import mms.ui.UIScreen;
-
+/**
+ * 
+ * @author Claudio Pérez
+ * Clase que facilita el trabajo con la capa UI desde los controladores nativos con Framework7
+ */
 public class HelperFM7 extends mms.helper.ui.HelperUI
 {
   public HelperFM7() {}
