@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name"><%=configProject.getString("mms.name")%></string>
+    <% String usefacebooklogin = configProject.getString("mms.usefacebooklogin");
+		   if(usefacebooklogin != null && usefacebooklogin.equals("1")) { %>
+    	<string name="facebook_app_id"><%=configProject.getString("mms.facebookidapp")%></string>
+    <% } %>
+    <string name="action_settings">Settings</string>
+</resources>
