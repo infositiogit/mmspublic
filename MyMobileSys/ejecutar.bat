@@ -1,1 +1,0 @@
-java -cp MyMobileSys.jar;"C:\Program Files\Java\jdk1.8.0_91\lib\tools.jar" mymobilesys.Deploy -p D:\eclipse\workspace\testmms2\testmms2.properties -pic D:\eclipse\workspace\MyMobileSys
