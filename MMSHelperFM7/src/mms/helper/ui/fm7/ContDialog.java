@@ -11,16 +11,18 @@ import mms.ui.UIController;
 public class ContDialog extends UIController {
 	
 	private OnDialogListener onDialogListener = null;
+	private Dialog dialog = null;
 	
-	public ContDialog(OnDialogListener dl) {
+	public ContDialog(OnDialogListener dl, Dialog d) {
 		onDialogListener = dl;
+		dialog = d;
 	}
 	
 	public void onButtonClick(String data) {
 		int index = Integer.parseInt(data);
 
 		if(onDialogListener != null)
-			onDialogListener.onButtonClick(index);
+			onDialogListener.onButtonClick(index, dialog);
 	}
 	
 	public void onDialogClose(String data) {

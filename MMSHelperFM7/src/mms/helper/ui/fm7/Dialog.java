@@ -1,9 +1,10 @@
 package mms.helper.ui.fm7;
 
 import java.util.ArrayList;
+
+import mms.app.MMSApp;
 import mms.ui.UIScreen;
 
-//TODO: Se debe agregar
 public class Dialog {
 	protected String title = "";
 	protected String message = "";
@@ -15,6 +16,9 @@ public class Dialog {
 	private UIScreen screen;
 	
 	private String nameVarAppFM7 = "";
+	private ContDialog cDialog = null;
+	
+	private int lastButtonIndex = -1;
 	
 	public Dialog(UIScreen s, String nameApp) {
 		super();
@@ -51,6 +55,10 @@ public class Dialog {
 		return this;
 	}
 	
+	public String getIdDialog() {
+		return idDialog;
+	}
+	
 	protected void createDialog() {
 		String abuttons = "[";
 		String onclick = "function(dialog, index) { MMSNative(F_CONTROLLER, 'mms.helper.ui.fm7.ContDialog_" + idDialog + ".onButtonClick',JSON.stringify(index)) }";
@@ -62,8 +70,9 @@ public class Dialog {
 		String sd = String.format("var %1$s = %2$s.dialog.create({title: '%3$s', text: '%4$s', buttons: %5$s, onClick: %6$s, destroyOnClose: true});",
 				idDialog, nameVarAppFM7, title, message, abuttons, onclick);
 		
-		ContDialog cDialog = new ContDialog(mOnDialogListener);
-		screen.addController(cDialog, "mms.helper.ui.fm7.ContDialog_" + idDialog);
+		cDialog = new ContDialog(mOnDialogListener, this);
+		cDialog.setName("mms.helper.ui.fm7.ContDialog_" + idDialog);
+		screen.addController(cDialog, cDialog.getName());
 		
 		sd = sd.replace("\r", "");
 		sd = sd.replace("\n", "");
@@ -83,6 +92,7 @@ public class Dialog {
 		if(idDialog != null) {
 			String sd = String.format("%1$s.close();", idDialog);
 			screen.executeJSView(sd);
+			screen.removeController(cDialog);
 		}
 		return this;
 	}
@@ -108,5 +118,50 @@ public class Dialog {
 
 	public static void showDialog(UIScreen scr, String nameApp, String title, String message) {
 		showDialog(scr, nameApp, title, message, null, null);
+	}
+	
+	public static int showDialogBlock(UIScreen scr, String nameApp, String title, String message, String[] buttons) {
+		final int indexB = -1;
+		
+		Dialog d = showDialog(scr, nameApp, title, message, buttons, new OnDialogListener() {
+
+			@Override
+			public void onButtonClick(int index, Dialog d) {
+				d.close();
+				d.setLastButtonIndex(index);
+				String mdid = "___MMSDialogOpen__" + d.getIdDialog();
+				if(MMSApp.containsKey(mdid)) {
+					if(MMSApp.getDataBoolean(mdid)) {
+						MMSApp.setData(mdid, false);
+					}
+				}
+				
+			}
+
+		});
+		
+		String mdid = "___MMSDialogOpen__" + d.getIdDialog();
+		MMSApp.setData(mdid, true);
+		
+		while(MMSApp.getDataBoolean(mdid)) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		//TODO: Falta agregar a MMS soporte para eliminar elementos de la colección MMSApp
+		//TODO: Falta eliminar el elemento ___MMSDialogOpen__ desde la colección MMSApp
+		return d.getLastButtonIndex();
+	}
+
+	protected int getLastButtonIndex() {
+		return lastButtonIndex;
+	}
+
+	protected void setLastButtonIndex(int lastButtonIndex) {
+		this.lastButtonIndex = lastButtonIndex;
 	}
 }
